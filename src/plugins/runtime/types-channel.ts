@@ -97,9 +97,30 @@ export type PluginRuntimeChannel = {
     probeDiscord: typeof import("../../discord/probe.js").probeDiscord;
     resolveChannelAllowlist: typeof import("../../discord/resolve-channels.js").resolveDiscordChannelAllowlist;
     resolveUserAllowlist: typeof import("../../discord/resolve-users.js").resolveDiscordUserAllowlist;
+    sendComponentMessage: typeof import("../../discord/send.js").sendDiscordComponentMessage;
     sendMessageDiscord: typeof import("../../discord/send.js").sendMessageDiscord;
     sendPollDiscord: typeof import("../../discord/send.js").sendPollDiscord;
     monitorDiscordProvider: typeof import("../../discord/monitor.js").monitorDiscordProvider;
+    typing: {
+      pulse: typeof import("../../discord/send.js").sendTypingDiscord;
+      start: (params: {
+        channelId: string;
+        accountId?: string;
+        cfg?: ReturnType<typeof import("../../config/config.js").loadConfig>;
+        intervalMs?: number;
+      }) => Promise<{
+        refresh: () => Promise<void>;
+        stop: () => void;
+      }>;
+    };
+    conversationActions: {
+      editMessage: typeof import("../../discord/send.js").editMessageDiscord;
+      deleteMessage: typeof import("../../discord/send.js").deleteMessageDiscord;
+      pinMessage: typeof import("../../discord/send.js").pinMessageDiscord;
+      unpinMessage: typeof import("../../discord/send.js").unpinMessageDiscord;
+      createThread: typeof import("../../discord/send.js").createThreadDiscord;
+      editChannel: typeof import("../../discord/send.js").editChannelDiscord;
+    };
   };
   slack: {
     listDirectoryGroupsLive: typeof import("../../slack/directory-live.js").listSlackDirectoryGroupsLive;

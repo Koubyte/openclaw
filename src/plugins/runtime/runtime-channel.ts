@@ -60,7 +60,18 @@ import { monitorDiscordProvider } from "../../discord/monitor.js";
 import { probeDiscord } from "../../discord/probe.js";
 import { resolveDiscordChannelAllowlist } from "../../discord/resolve-channels.js";
 import { resolveDiscordUserAllowlist } from "../../discord/resolve-users.js";
-import { sendMessageDiscord, sendPollDiscord } from "../../discord/send.js";
+import {
+  createThreadDiscord,
+  deleteMessageDiscord,
+  editChannelDiscord,
+  editMessageDiscord,
+  pinMessageDiscord,
+  sendDiscordComponentMessage,
+  sendMessageDiscord,
+  sendPollDiscord,
+  sendTypingDiscord,
+  unpinMessageDiscord,
+} from "../../discord/send.js";
 import { monitorIMessageProvider } from "../../imessage/monitor.js";
 import { probeIMessage } from "../../imessage/probe.js";
 import { sendMessageIMessage } from "../../imessage/send.js";
@@ -124,6 +135,7 @@ import {
   unpinMessageTelegram,
 } from "../../telegram/send.js";
 import { resolveTelegramToken } from "../../telegram/token.js";
+import { createDiscordTypingLease } from "./runtime-discord-typing.js";
 import { createTelegramTypingLease } from "./runtime-telegram-typing.js";
 import { createRuntimeWhatsApp } from "./runtime-whatsapp.js";
 import type { PluginRuntime } from "./types.js";
@@ -220,9 +232,33 @@ export function createRuntimeChannel(): PluginRuntime["channel"] {
       probeDiscord,
       resolveChannelAllowlist: resolveDiscordChannelAllowlist,
       resolveUserAllowlist: resolveDiscordUserAllowlist,
+      sendComponentMessage: sendDiscordComponentMessage,
       sendMessageDiscord,
       sendPollDiscord,
       monitorDiscordProvider,
+      typing: {
+        pulse: sendTypingDiscord,
+        start: async ({ channelId, accountId, cfg, intervalMs }) =>
+          await createDiscordTypingLease({
+            channelId,
+            accountId,
+            cfg,
+            intervalMs,
+            pulse: async ({ channelId, accountId, cfg }) =>
+              void (await sendTypingDiscord(channelId, {
+                accountId,
+                cfg,
+              })),
+          }),
+      },
+      conversationActions: {
+        editMessage: editMessageDiscord,
+        deleteMessage: deleteMessageDiscord,
+        pinMessage: pinMessageDiscord,
+        unpinMessage: unpinMessageDiscord,
+        createThread: createThreadDiscord,
+        editChannel: editChannelDiscord,
+      },
     },
     slack: {
       listDirectoryGroupsLive: listSlackDirectoryGroupsLive,
