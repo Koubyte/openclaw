@@ -107,6 +107,13 @@ export type PluginCommandRegistration = {
   source: string;
 };
 
+export type PluginRecordLifecycleState =
+  | "prepared"
+  | "disabled"
+  | "validated"
+  | "registered"
+  | "error";
+
 export type PluginRecord = {
   id: string;
   name: string;
@@ -118,6 +125,7 @@ export type PluginRecord = {
   workspaceDir?: string;
   enabled: boolean;
   status: "loaded" | "disabled" | "error";
+  lifecycleState?: PluginRecordLifecycleState;
   error?: string;
   toolNames: string[];
   hookNames: string[];
